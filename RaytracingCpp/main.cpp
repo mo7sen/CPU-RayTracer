@@ -1,96 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include "common.h"
+#include "RenderTargetPPMImage.h"
 #include "Color.h"
 #include "MSColor.h"
 #include "Camera.h"
 #include <omp.h>
-
-const int32_t DEFAULT_WIDTH = 800;
-const int32_t DEFAULT_HEIGHT = 800;
-
-class PPMImageRenderFrame {
-private:
-	int32_t m_width;
-	int32_t m_height;
-
-	std::vector<Color> m_pixels;
-
-	void frameStream(std::ostream & os, std::ostream & progstream)
-	{
-		os << "P3\n" << m_width << ' ' << m_height << "\n255\n";
-
-		for (int j = m_height - 1; j >= 0; --j)
-		{
-			progstream << "\rScanlines remaining: " << j << ' ' << std::flush;
-			for (int i = 0; i < m_width; ++i)
-			{
-				int32_t idx = j * m_width + i;
-				Color pixelColor = m_pixels[idx];
-				os << pixelColor << ' ';
-			}
-			os << std::endl;
-		}
-		progstream << "\nDone.\n";
-	}
-
-public:
-	PPMImageRenderFrame() : PPMImageRenderFrame(DEFAULT_WIDTH, DEFAULT_HEIGHT) {};
-	PPMImageRenderFrame(int32_t width, int32_t height)
-		: m_width(width), m_height(height) 
-	{
-		std::vector<Color> pixels(size_t(m_width) * size_t(m_height));
-		m_pixels = pixels;
-	}
-
-	void setHeight(int32_t height)
-	{
-		m_height = height;
-	}
-
-	void setWidth(int32_t width)
-	{
-		m_width = width;
-	}
-
-	int32_t getHeight() const
-	{
-		return m_height;
-	}
-
-	int32_t getWidth() const
-	{
-		return m_width;
-	}
-
-	void renderFrameToConsole()
-	{
-		frameStream(std::cout, std::cerr);
-	}
-
-	void renderFrameToFile(std::string filename)
-	{
-		std::ofstream imageFile;
-		imageFile.open (filename);
-		frameStream(imageFile, std::cerr);
-		imageFile.close();
-	}
-
-	void setPixel(int32_t x, int32_t y, Color const& color)
-	{
-		int32_t idx = y * m_width + x;
-		m_pixels[idx] = color;
-	}
-
-	Color getPixel(int32_t x, int32_t y) const
-	{
-		int32_t idx = y * m_width + x;
-		return m_pixels[idx];
-	}
-	
-	~PPMImageRenderFrame() = default;
-};
 
 #include "Ray.h"
 #include "HitData.h"
@@ -125,14 +38,15 @@ int main(int argc, char** argv)
 {
 	// Image
 	const auto aspect_ratio = real(16.0 / 9.0);
-	const int32_t image_width = 1920;
+	const int32_t image_width = 640;
 	const int32_t image_height = static_cast<int>(image_width / aspect_ratio);
 
-	PPMImageRenderFrame image(image_width, image_height);
+	auto render_target = RenderTargetPPMImage(image_width, image_height);
+	render_target.setOutFile("image.ppm");
 
 	// Camera
-	real fov = 90;
-	Vec3 look_from(3, 3, 2);
+	real fov = 60;
+	Vec3 look_from(-6, 3, 2);
 	Vec3 look_at(0, 0, -1);
 	Vec3 up(0, 1, 0);
 	auto dist_to_focus = (look_from - look_at).length();
@@ -158,14 +72,14 @@ int main(int argc, char** argv)
 	const int32_t samples_per_pixel = 100;
 	const int32_t max_ray_depth = 30;
 
-    omp_set_num_threads(8);
+    omp_set_num_threads(10);
 
-	uint32_t scanlines_remaining = image.getHeight();
+	uint32_t scanlines_remaining = render_target.getHeight();
 
 #pragma omp parallel for
-	for (int j = image.getHeight() - 1; j >= 0; --j)
+	for (int j = render_target.getHeight() - 1; j >= 0; --j)
 	{
-		for (int i = 0; i < image.getWidth(); ++i)
+		for (int i = 0; i < render_target.getWidth(); ++i)
 		{
 			MSColor pixel_color;
 			for (int s = 0; s < samples_per_pixel; ++s)
@@ -176,7 +90,7 @@ int main(int argc, char** argv)
 				pixel_color += rayColor(ray, list, max_ray_depth);
 			}
 			pixel_color.reduce();
-			image.setPixel(i, j, pixel_color);
+			render_target.setPixel(i, j, pixel_color);
 		}
 #pragma omp atomic
   	    scanlines_remaining--;
@@ -185,6 +99,6 @@ int main(int argc, char** argv)
 			std::cerr << "\rScanlines remaining: " << scanlines_remaining << ' ' << std::flush;
 		}
 	}
-	image.renderFrameToFile("image.ppm");
+	render_target.renderFrame();
 	return 0;
 }

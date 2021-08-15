@@ -172,6 +172,8 @@
     <ClInclude Include="MSColor.h" />
     <ClInclude Include="Point3.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="RenderTargetPPMImage.h" />
     <ClInclude Include="SphereTraceable.h" />
     <ClInclude Include="Traceable.h" />
     <ClInclude Include="common.h" />
