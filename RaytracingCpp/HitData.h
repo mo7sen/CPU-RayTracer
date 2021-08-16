@@ -12,6 +12,9 @@ public:
 	std::shared_ptr<Material> material;
 	bool front; // Ray entering the object
 
+	double u;
+	double v;
+
 public:
 	HitData() = default;
 

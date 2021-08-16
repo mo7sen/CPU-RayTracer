@@ -26,7 +26,7 @@ public:
 		else
 			scatter_direction = refract(unit_direction, hitData.hitNormal, refraction_ratio);
 
-		ray_scattered = Ray(hitData.hitPos, scatter_direction);
+		ray_scattered = Ray(hitData.hitPos, scatter_direction, ray_in.time());
 		return true;
 	}
 

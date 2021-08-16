@@ -14,7 +14,9 @@ public:
 		real vfov_in_deg, 
 		real aspect_ratio,
 		real aperture,
-		real focus_dist
+		real focus_dist,
+		double _time0 = 0.0,
+		double _time1 = 0.0
 	)
 	{
 		real vfov_in_rad = deg2rad(vfov_in_deg);
@@ -32,6 +34,9 @@ public:
 		vertical = v * viewport_height * focus_dist;
 		lb_corner = origin - horizontal / 2 - vertical / 2 - focus_dist * w;
 		lens_radius = aperture / 2;
+
+		time0 = _time0;
+		time1 = _time1;
 	}
 
 	Ray get_ray(real s, real t);
@@ -44,5 +49,7 @@ private:
 	Vec3 vertical;
 	Vec3 w, u, v;
 	real lens_radius;
+	double time0; // Shutter Open Time
+	double time1; // Shutter Close Time
 };
 

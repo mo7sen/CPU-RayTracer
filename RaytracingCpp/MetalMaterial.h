@@ -9,7 +9,7 @@ public:
     virtual bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const override
     {
         Vec3 reflected = reflect(unit_vector(ray_in.direction()), hitData.hitNormal);
-        ray_scattered = Ray(hitData.hitPos, reflected + fuzziness * random_vec_in_unit_sphere());
+        ray_scattered = Ray(hitData.hitPos, reflected + fuzziness * random_vec_in_unit_sphere(), ray_in.time());
         attenuation = albedo;
         return (dot(ray_scattered.direction(), hitData.hitNormal) > 0);
     }
