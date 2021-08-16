@@ -8,5 +8,5 @@
 class Traceable
 {
 public:
-	virtual bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const = 0;
+	bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const { return false; }
 };

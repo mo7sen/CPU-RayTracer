@@ -8,7 +8,7 @@ class DielectricMaterial : public Material
 public:
 	DielectricMaterial(real index_of_refraction) : ir(index_of_refraction) {}
 
-	virtual bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const override
+	bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const
 	{
 		attenuation = Color(1.0);
 		real refraction_ratio = hitData.front ? (1.0 / ir) : ir;

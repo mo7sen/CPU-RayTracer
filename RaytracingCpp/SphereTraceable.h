@@ -13,7 +13,7 @@ public:
 	SphereTraceable() = default;
 	SphereTraceable(Point3 c, real r, std::shared_ptr<Material> m) : center(c), radius(r), material(m) {}
 
-	virtual bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const override;
+	bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const;
 
 private:
 	static void getUV(const Point3& p, double& u, double& v);

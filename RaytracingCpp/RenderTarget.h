@@ -14,6 +14,6 @@ public:
 	int32_t getHeight() const { return m_height; }
 	int32_t getWidth() const { return m_width; }
 
-	virtual Color getPixel(int32_t x, int32_t y) const = 0;
-	virtual void setPixel(int32_t x, int32_t y, Color const& color) = 0;
+	Color getPixel(int32_t x, int32_t y) const { return Color(0.0, 0.0, 0.0); };
+	void setPixel(int32_t x, int32_t y, Color const& color) {};
 };

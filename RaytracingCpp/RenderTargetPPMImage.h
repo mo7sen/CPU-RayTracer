@@ -51,13 +51,13 @@ public:
 		renderFrameToFile(out_file);
 	}
 
-	void setPixel(int32_t x, int32_t y, Color const& color) override
+	void setPixel(int32_t x, int32_t y, Color const& color)
 	{
 		int32_t idx = y * m_width + x;
 		m_pixels[idx] = color;
 	}
 
-	Color getPixel(int32_t x, int32_t y) const override
+	Color getPixel(int32_t x, int32_t y) const
 	{
 		int32_t idx = y * m_width + x;
 		return m_pixels[idx];

@@ -17,7 +17,7 @@ public:
 	ImageTexture(): data(nullptr), width(0), height(0), bytes_per_scanline(0) {}
 	ImageTexture(const char *image_path);
 
-	virtual Color value(double u, double v, const Point3& p) const override;
+	Color value(double u, double v, const Point3& p) const;
 
 	~ImageTexture() { delete data; }
 private:

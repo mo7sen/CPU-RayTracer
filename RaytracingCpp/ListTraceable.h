@@ -15,6 +15,6 @@ public:
 	void clear();
 	void add(std::shared_ptr<Traceable> object);
 
-	virtual bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const override;
+	bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const;
 };
 

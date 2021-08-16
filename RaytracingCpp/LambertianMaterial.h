@@ -11,7 +11,7 @@ public:
 	LambertianMaterial(const Color& a) : albedo(std::make_shared<SolidColorTexture>(a)) {}
 	LambertianMaterial(std::shared_ptr<Texture> a) : albedo(a) {}
 
-	virtual bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const override
+	bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const
 	{
 		auto scatterDirection = hitData.hitNormal + unit_vector((random_vec_in_unit_sphere()));
 

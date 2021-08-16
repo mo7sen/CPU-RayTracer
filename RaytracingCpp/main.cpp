@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	list.add(std::make_shared<SphereTraceable>(Point3( 0.0, 2.0, 0.0), 0.4, material_light));
 
 	// Render
-	const int32_t samples_per_pixel = 3000;
+	const int32_t samples_per_pixel = 1000;
 	const int32_t max_ray_depth = 30;
 
     omp_set_num_threads(10);
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 	const uint32_t tile_count_x = (image_width + tile_size_x - 1) / tile_size_x;
 	const uint32_t tile_count_y = (image_height + tile_size_y - 1) / tile_size_y;
 
-#pragma omp parallel for schedule(dynamic)
+#pragma omp parallel for collapse(2)
 	for(int tile_idx_x = 0; tile_idx_x < tile_count_x; tile_idx_x++) 
 	{
 		for(int tile_idx_y = 0; tile_idx_y < tile_count_y; tile_idx_y++)
