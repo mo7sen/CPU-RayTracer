@@ -10,6 +10,7 @@ ImageTexture::ImageTexture(const char *image_path)
 	if(!data) 
 	{
 		std::cerr << "Error: Could not load texture image file '" << image_path << "'.\n";
+		exit(1);
 		width = height = 0;
 	}
 	bytes_per_scanline = bytes_per_pixel * width;

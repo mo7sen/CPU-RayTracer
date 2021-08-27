@@ -7,18 +7,18 @@ class HitData
 {
 public:
 	Point3 hitPos;
-	Vec3 hitNormal;
+	Vec3f hitNormal;
 	real t;
 	std::shared_ptr<Material> material;
 	bool front; // Ray entering the object
 
-	double u;
-	double v;
+	float u;
+	float v;
 
 public:
 	HitData() = default;
 
-	inline void set_face_normal(const Ray& ray, const Vec3& outward_normal)
+	inline void set_face_normal(const Ray& ray, const Vec3f& outward_normal)
 	{
 		front = dot(ray.direction(), outward_normal) < 0;
 		hitNormal = front ? outward_normal : -outward_normal;

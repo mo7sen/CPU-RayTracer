@@ -13,12 +13,12 @@ public:
 
 	bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const
 	{
-		auto scatterDirection = hitData.hitNormal + unit_vector((random_vec_in_unit_sphere()));
+		auto scatterDirection = hitData.hitNormal + normalize((random_vec_in_unit_sphere()));
 
-		if (scatterDirection.near_zero()) // Edge case where random vector = -hitNormal
+		if (near_zero(scatterDirection)) // Edge case where random vector = -hitNormal
 			scatterDirection = hitData.hitNormal;
 
-		ray_scattered = Ray(hitData.hitPos, unit_vector(scatterDirection), ray_in.time());
+		ray_scattered = Ray(hitData.hitPos, normalize(scatterDirection), ray_in.time());
 		attenuation = albedo->value(hitData.u, hitData.v, hitData.hitPos);
 		return true;
 	}

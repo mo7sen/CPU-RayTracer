@@ -13,7 +13,7 @@ public:
 	SolidColorTexture(double red, double green, double blue):
 		SolidColorTexture(Color(red, green, blue)) {}
 
-	Color value(double u, double v, const Point3& p) const {
+	virtual Color value(double u, double v, const Point3& p) const override {
 		return color_value;
 	}
 };

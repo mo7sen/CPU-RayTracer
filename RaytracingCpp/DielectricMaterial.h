@@ -12,16 +12,16 @@ public:
 	{
 		attenuation = Color(1.0);
 		real refraction_ratio = hitData.front ? (1.0 / ir) : ir;
-		Vec3 unit_direction = unit_vector(ray_in.direction());
+		Vec3f unit_direction = normalize(ray_in.direction());
 
 		double cos_theta = fmin(dot(-unit_direction, hitData.hitNormal), 1.0);
 		double sin_theta = sqrt(1 - cos_theta * cos_theta);
 
 		bool total_internal_reflection = (refraction_ratio * sin_theta) > 1.0;
 
-		Vec3 scatter_direction;
+		Vec3f scatter_direction;
 
-		if (total_internal_reflection || reflectance(cos_theta, refraction_ratio) > random_double())
+		if (total_internal_reflection || reflectance(cos_theta, refraction_ratio) > random_float())
 			scatter_direction = reflect(unit_direction, hitData.hitNormal);
 		else
 			scatter_direction = refract(unit_direction, hitData.hitNormal, refraction_ratio);

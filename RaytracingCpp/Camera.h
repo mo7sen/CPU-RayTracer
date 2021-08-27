@@ -10,7 +10,7 @@ public:
 	Camera(
 		Point3 look_from,
 		Point3 look_at,
-		Vec3 up,
+		Vec3f up,
 		real vfov_in_deg, 
 		real aspect_ratio,
 		real aperture,
@@ -25,14 +25,14 @@ public:
 		auto viewport_height = 2.0 * hfov_in_rad;
 		auto viewport_width = viewport_height * aspect_ratio;
 
-		w = unit_vector(look_from - look_at);
-		u = unit_vector(cross(up, w));
+		w = normalize(look_from - look_at);
+		u = normalize(cross(up, w));
 		v = cross(w, u);
 
 		origin = look_from;
 		horizontal = u * viewport_width * focus_dist;
 		vertical = v * viewport_height * focus_dist;
-		lb_corner = origin - horizontal / 2 - vertical / 2 - focus_dist * w;
+		lb_corner = origin - horizontal / 2.0 - vertical / 2.0 - focus_dist * w;
 		lens_radius = aperture / 2;
 
 		time0 = _time0;
@@ -45,9 +45,9 @@ public:
 private:
 	Point3 origin;
 	Point3 lb_corner;
-	Vec3 horizontal;
-	Vec3 vertical;
-	Vec3 w, u, v;
+	Vec3f horizontal;
+	Vec3f vertical;
+	Vec3f w, u, v;
 	real lens_radius;
 	double time0; // Shutter Open Time
 	double time1; // Shutter Close Time

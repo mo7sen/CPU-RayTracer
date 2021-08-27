@@ -7,15 +7,20 @@
 
 #include "Ray.h"
 #include "HitData.h"
+#include "ImageTexture.h"
 #include "Traceable.h"
-Color rayColor(const Ray& r, const Color& background, const Traceable& scene, int32_t depth)
+#include "SphereTraceable.h"
+
+Color rayColor(const Ray& r, const Texture& background, const Traceable& scene, int32_t depth)
 {
 	if (depth <= 0) return Color(0.0);
 
 	HitData hitData;
 	if(!scene.hit(r, 0.001, INF, hitData))
 	{
-		return background;
+		float u, v;
+		SphereTraceable::getUV(normalize(r.direction() * -1.0), u, v);
+		return background.value(u, v, Vec3f(0.0));
 	}
 
 	Color emitted = hitData.material->emitted(hitData.u, hitData.v, hitData.hitPos);
@@ -31,15 +36,15 @@ Color rayColor(const Ray& r, const Color& background, const Traceable& scene, in
 }
 
 #include "ListTraceable.h"
-#include "SphereTraceable.h"
+#include "BVHNode.h"
 #include "MovingSphereTraceable.h"
+#include "StaticMeshTraceable.h"
 #include "LambertianMaterial.h"
 #include "MetalMaterial.h"
 #include "DielectricMaterial.h"
 #include "DiffuseLightMaterial.h"
 
 #include "CheckeredTexture.h"
-#include "ImageTexture.h"
 
 int main(int argc, char** argv)
 {
@@ -52,94 +57,80 @@ int main(int argc, char** argv)
 	render_target.setOutFile("image.ppm");
 
 	// Camera
-	real fov = 90;
-	Vec3 look_from(-3, 3, 2);
-	Vec3 look_at(0, 0, -1);
-	Vec3 up(0, 1, 0);
-	auto dist_to_focus = (look_from - look_at).length();
+	real fov = 60;
+	Vec3f look_from(0, 200, 100);
+	// Vec3f look_from(-2, 5, 2);
+	// Vec3f look_from(0, 3, 2);
+	Vec3f look_at(0, 200, -1);
+	Vec3f up(0, 1, 0);
+	auto dist_to_focus = length(look_from - look_at);
 	auto aperture = 0.1;
 
-	Camera camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, 0, 1);
+	real frameTime0 = 0.0;
+	real frameTime1 = 1.0;
+	Camera camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
 
-	Color background = Color(0.0, 0.0, 0.0);
+	// Color background = Color(0, 0, 0);
+	// Color background = Color(1, 1, 1);
+	ImageTexture background("res/earth.jpg");
+	//SolidColorTexture background(Color(0.1, 0.1, 0.1));
 
 	// SceneDielectricMaterial
 	ListTraceable list;
 
 	auto material_ground = std::make_shared<LambertianMaterial>(std::make_shared<CheckeredTexture>(Color(0.0, 0.0, 0.0), Color(1.0, 1.0, 1.0), 10.0));
-	// auto material_center = std::make_shared<LambertianMaterial>(Color(0.1, 0.2, 0.5));
+	//auto material_center = std::make_shared<LambertianMaterial>(Color(0.1, 0.2, 0.5));
 	auto material_center = std::make_shared<LambertianMaterial>(std::make_shared<ImageTexture>("res/earth.jpg"));
 	auto material_left   = std::make_shared<DielectricMaterial>(1.5);
 	auto material_right  = std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2), 0.0);
-	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(1.0, 1.0, 1.0));
+	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
 
-	list.add(std::make_shared<SphereTraceable>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground));
-	list.add(std::make_shared<SphereTraceable>(Point3( 0.0,    0.0, -1.0),   0.5, material_center));
-	list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0),   0.5, material_left));
-	list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0), -0.45, material_left));
-	list.add(std::make_shared<SphereTraceable>(Point3( 1.0,    0.0, -1.0),   0.5, material_right));
+	//list.add(std::make_shared<SphereTraceable>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+	//list.add(std::make_shared<SphereTraceable>(Point3( 0.0,    0.0, -1.0),   0.5, material_center));
+	//list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0),   0.5, material_left));
+	//list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0), -0.45, material_left));
+	//list.add(std::make_shared<SphereTraceable>(Point3( 1.0,    0.0, -1.0),   0.5, material_right));
 
-	list.add(std::make_shared<MovingSphereTraceable>(Point3( 1.0, 0.0, 1.0), Point3( -1.0, 0.0, 1.0), 0.0, 0.2, 0.5, material_center));
+	//list.add(std::make_shared<MovingSphereTraceable>(Point3(1.0, 0.0, 1.0), Point3(-1.0, 0.0, 1.0), 0.0, 0.2, 0.5, material_center));
 
-	list.add(std::make_shared<SphereTraceable>(Point3( 0.0, 2.0, 0.0), 0.4, material_light));
+	//list.add(std::make_shared<SphereTraceable>(Point3( -1.0, 3.0, 4.0), 0.4, material_light));
+	auto material_superlight  = std::make_shared<DiffuseLightMaterial>(Color(4.0, 4.0, 3.0));
+	//list.add(std::make_shared<SphereTraceable>(Point3( 70.0, 200.0, 50.0), 20, material_superlight));
+
+	list.add(std::make_shared<StaticMeshTraceable>("res/IronMan2_PBR.obj", "res"));
+	// list.add(std::make_shared<SphereTraceable>(Point3(30.0, 200, 50), 20.0, material_right));
+
+	BVHNode bvh(list, frameTime0, frameTime1);
+	print_bvh(&bvh, 0);
 
 	// Render
-	const int32_t samples_per_pixel = 1000;
-	const int32_t max_ray_depth = 30;
+	const int32_t samples_per_pixel = 10;
+	const int32_t max_ray_depth = 10;
 
-    omp_set_num_threads(10);
-	const uint32_t tile_size_x = 16;
-	const uint32_t tile_size_y = 16;
+    omp_set_num_threads(7);
 
-	const uint32_t tile_count_x = (image_width + tile_size_x - 1) / tile_size_x;
-	const uint32_t tile_count_y = (image_height + tile_size_y - 1) / tile_size_y;
-
-#pragma omp parallel for collapse(2)
-	for(int tile_idx_x = 0; tile_idx_x < tile_count_x; tile_idx_x++) 
+#pragma omp parallel for schedule(static, 2) collapse(2)
+	for (int j = 0; j < image_height; ++j)
 	{
-		for(int tile_idx_y = 0; tile_idx_y < tile_count_y; tile_idx_y++)
+		for (int i = 0; i < image_width; ++i)
 		{
-			// Render Tile
-			for(int pixel_in_tile_x = tile_idx_x * tile_size_x + 0; 
-				pixel_in_tile_x < ((tile_idx_x + 1) * tile_size_x) && pixel_in_tile_x < render_target.getWidth();
-				pixel_in_tile_x++)
+			MSColor pixel_color;
+			for (int s = 0; s < samples_per_pixel; ++s)
 			{
-				for(int pixel_in_tile_y = tile_idx_y * tile_size_y + 0;
-					pixel_in_tile_y < ((tile_idx_y + 1) * tile_size_y) && pixel_in_tile_y < render_target.getHeight();
-					pixel_in_tile_y++)
-				{
-					MSColor pixel_color;
-					for (int s = 0; s < samples_per_pixel; ++s)
-					{
-						auto u = real(pixel_in_tile_x + random_double()) / (image_width-1);
-						auto v = real(pixel_in_tile_y + random_double()) / (image_height-1);
-						auto ray = camera.get_ray(u, v);
-						pixel_color += rayColor(ray, background, list, max_ray_depth);
-					}
-					pixel_color.reduce();
-					render_target.setPixel(pixel_in_tile_x, pixel_in_tile_y, pixel_color);
-				}
-			}
-		}
-	}
+				auto u = real(i + random_float()) / (image_width-1);
+				auto v = real(j + random_float()) / (image_height-1);
 
-//#pragma omp parallel for
-//	for (int j = render_target.getHeight() - 1; j >= 0; --j)
-//	{
-//		for (int i = 0; i < render_target.getWidth(); ++i)
-//		{
-//			MSColor pixel_color;
-//			for (int s = 0; s < samples_per_pixel; ++s)
-//			{
-//				auto u = real(i + random_double()) / (image_width-1);
-//				auto v = real(j + random_double()) / (image_height-1);
-//				auto ray = camera.get_ray(u, v);
-//				pixel_color += rayColor(ray, list, max_ray_depth);
-//			}
-//			pixel_color.reduce();
-//			render_target.setPixel(i, j, pixel_color);
-//		}
-//	}
+				// auto u = real(i) / real(image_width - 1);
+				// auto v = real(j) / real(image_height - 1);
+
+				auto ray = camera.get_ray(u, v);
+				pixel_color += rayColor(ray, background, bvh, max_ray_depth);
+			}
+			pixel_color.reduce();
+			render_target.setPixel(i, j, pixel_color);
+		}
+		printf("Scanline %d\n", j);
+	}
 	render_target.renderFrame();
 	return 0;
 }

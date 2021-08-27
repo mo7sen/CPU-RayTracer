@@ -63,11 +63,13 @@ public:
 		return m_pixels[idx];
 	}
 
-	std::string getOutFile() const {
+	std::string getOutFile() const 
+	{
 		return out_file;
 	}
 
-	void setOutFile(std::string outFileName) {
+	void setOutFile(std::string outFileName) 
+	{
 		out_file = outFileName;
 	}
 	

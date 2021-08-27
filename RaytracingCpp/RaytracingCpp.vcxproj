@@ -119,6 +119,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <CallingConvention>VectorCall</CallingConvention>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +140,11 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <OpenMPSupport>true</OpenMPSupport>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <CallingConvention>VectorCall</CallingConvention>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,9 +160,12 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AABB.cpp" />
+    <ClCompile Include="BVHNode.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CheckeredTexture.cpp" />
     <ClCompile Include="extern\stb_image.cpp" />
+    <ClCompile Include="extern\tiny_obj_loader.cpp" />
     <ClCompile Include="ImageTexture.cpp" />
     <ClCompile Include="ListTraceable.cpp" />
     <ClCompile Include="main.cpp" />
@@ -163,15 +177,19 @@
     <ClCompile Include="LambertianMaterial.cpp" />
     <ClCompile Include="SolidColorTexture.cpp" />
     <ClCompile Include="SphereTraceable.cpp" />
+    <ClCompile Include="StaticMeshTraceable.cpp" />
     <ClCompile Include="Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.h" />
+    <ClInclude Include="BVHNode.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CheckeredTexture.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="DielectricMaterial.h" />
     <ClInclude Include="DiffuseLightMaterial.h" />
     <ClInclude Include="extern\stb_image.h" />
+    <ClInclude Include="extern\tiny_obj_loader.h" />
     <ClInclude Include="HitData.h" />
     <ClInclude Include="ImageTexture.h" />
     <ClInclude Include="LambertianMaterial.h" />
@@ -186,6 +204,7 @@
     <ClInclude Include="RenderTargetPPMImage.h" />
     <ClInclude Include="SolidColorTexture.h" />
     <ClInclude Include="SphereTraceable.h" />
+    <ClInclude Include="StaticMeshTraceable.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Traceable.h" />
     <ClInclude Include="common.h" />

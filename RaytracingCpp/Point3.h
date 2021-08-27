@@ -2,6 +2,6 @@
 #define RT_POINT3_HEADER
 
 #include "Vec3.h"
-using Point3 = Vec3;
+using Point3 = Vec3f;
 
 #endif

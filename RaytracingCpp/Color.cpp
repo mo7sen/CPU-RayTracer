@@ -1,9 +1,7 @@
 #include "Color.h"
 
-Color Color::fromUnitVector(const Vec3& v)
+Color Color::fromUnitVector(const Vec3f& v)
 {
-	return Color(
-		(v.x() + real(1.0)) * real(0.5),
-		(v.y() + real(1.0)) * real(0.5), 
-		(v.z() + real(1.0)) * real(0.5));
+	Vec3f mapped = (v + Vec3f(1.0, 1.0, 1.0)) / 2.0;
+	return Color(mapped.x(), mapped.y(), mapped.z());
 }

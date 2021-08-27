@@ -12,7 +12,7 @@ public:
 	Color(real rgb) : Color(rgb, rgb, rgb) {}
 	Color(real r, real g, real b) : data{ r, g, b, 1.0 } {}
 
-	static Color fromUnitVector(const Vec3& v);
+	static Color fromUnitVector(const Vec3f& v);
 
 	real r() const { return data[0]; }
 	real g() const { return data[1]; }
