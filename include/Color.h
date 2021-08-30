@@ -6,21 +6,26 @@
 
 class Color {
 public:
-	real data[4];
+	static const int32_t COMP_PER_PIXEL = 4;
+
+	real data[COMP_PER_PIXEL];
 public:
 	Color() = default;
 	Color(real rgb) : Color(rgb, rgb, rgb) {}
-	Color(real r, real g, real b) : data{ r, g, b, 1.0 } {}
+	Color(real r, real g, real b) : Color(r, g, b, 1.0) {}
+	Color(real r, real g, real b, real a) : data{ r, g, b, a } {}
 
 	static Color fromUnitVector(const Vec3f& v);
 
 	real r() const { return data[0]; }
 	real g() const { return data[1]; }
 	real b() const { return data[2]; }
+	real a() const { return data[3]; }
 
 	uint32_t r_u8() const { return static_cast<uint32_t>(255.999 * data[0]); }
 	uint32_t g_u8() const { return static_cast<uint32_t>(255.999 * data[1]); }
 	uint32_t b_u8() const { return static_cast<uint32_t>(255.999 * data[2]); }
+	uint32_t a_u8() const { return static_cast<uint32_t>(255.999 * data[3]); }
 
 	void set(real r, real g, real b) { data[0] = r; data[1] = g; data[2] = b; }
 

@@ -8,6 +8,7 @@
 #include <HitData.h>
 
 #include <render_targets/RenderTargetPPMImage.h>
+#include <render_targets/RenderTargetPNGImage.h>
 
 #include <textures/ImageTexture.h>
 #include <textures/CheckeredTexture.h>
@@ -54,8 +55,10 @@ int main(int argc, char** argv)
 	const int32_t image_width = 1280;
 	const int32_t image_height = static_cast<int>(image_width / aspect_ratio);
 
-	auto render_target = RenderTargetPPMImage(image_width, image_height);
-	render_target.setOutFile("image.ppm");
+	/* auto render_target = RenderTargetPPMImage(image_width, image_height); */
+	auto render_target = RenderTargetPNGImage(image_width, image_height);
+	/* render_target.setOutFile("image.ppm"); */
+	render_target.setOutFile("png_test.png");
 
 	// Camera
 	real fov = 60;

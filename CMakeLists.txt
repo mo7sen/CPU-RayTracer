@@ -22,6 +22,8 @@ add_executable(tracer
   "${PROJECT_SOURCE_DIR}/src/traceables/MovingSphereTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/SphereTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/StaticMeshTraceable.cpp"
+
+  "${PROJECT_SOURCE_DIR}/src/render_targets/RenderTargetPNGImage.cpp"
   )
 
 target_include_directories(tracer PUBLIC
