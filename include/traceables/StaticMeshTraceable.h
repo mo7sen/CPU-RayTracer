@@ -26,12 +26,13 @@ public:
 		virtual bool bounding_box(real time0, real time1, AABB& aabb) const override;
 	};
 
-private:
+protected:
 	ListTraceable primitivesList;
 	BVHNode primitivesBVH;
 
 public:
-	StaticMeshTraceable(std::string path, std::string mtl_search_path, real time0 = 0.0, real time1 = 0.0);
+	StaticMeshTraceable() = default;
+	StaticMeshTraceable(std::string path, std::string res_path = ".", real time0 = 0.0, real time1 = 0.0);
 
 	virtual bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const override;
 	virtual bool bounding_box(real time0, real time1, AABB& aabb) const override;

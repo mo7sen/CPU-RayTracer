@@ -18,6 +18,7 @@
 #include <traceables/BVHNode.h>
 #include <traceables/MovingSphereTraceable.h>
 #include <traceables/StaticMeshTraceable.h>
+#include <traceables/GLTFStaticMeshTraceable.h>
 
 #include <materials/LambertianMaterial.h>
 #include <materials/MetalMaterial.h>
@@ -62,11 +63,12 @@ int main(int argc, char** argv)
 
 	// Camera
 	real fov = 60;
-	Vec3f look_from(0.0f, 200.0f, 100.0f);
-	/* Vec3f look_from(-2.0f, 5.0f, 2.0f); */
-	// Vec3f look_from(0.0f, 3.0f, 2.0f);
-	Vec3f look_at(0.0f, 200.0f, -1.0f);
-	/* Vec3f look_at(0.0f, 0.0f, -1.0f); */
+	/* Vec3f look_from(0.0f, 200.0f, 100.0f); */
+	Vec3f look_from(-2.0f, 5.0f, 5.0f);
+	/* Vec3f look_from(0.0f, 3.0f, 2.0f); */
+	/* Vec3f look_at(0.0f, 200.0f, -1.0f); */
+	Vec3f look_at(0.0f, 0.0f, -1.0f);
+	/* Vec3f look_at(0.0f, 0.0f, 0.0f); */
 	Vec3f up(0.0f, 1.0f, 0.0f);
 	auto dist_to_focus = length(look_from - look_at);
 	auto aperture = 0.1;
@@ -77,18 +79,18 @@ int main(int argc, char** argv)
 
 	/* Color background = Color(0, 0, 0); */
 	// Color background = Color(1, 1, 1);
-	ImageTexture background("res/earth.jpg");
-	/* SolidColorTexture background(Color(0.1, 0.1, 0.1)); */
+	/* ImageTexture background("res/earth.jpg"); */
+	SolidColorTexture background(Color(0.1, 0.1, 0.1));
 
 	// SceneDielectricMaterial
 	ListTraceable list;
 
-	/* auto material_ground = std::make_shared<LambertianMaterial>(std::make_shared<CheckeredTexture>(Color(0.0, 0.0, 0.0), Color(1.0, 1.0, 1.0), 10.0)); */
+	auto material_ground = std::make_shared<LambertianMaterial>(std::make_shared<CheckeredTexture>(Color(0.0, 0.0, 0.0), Color(1.0, 1.0, 1.0), 10.0));
 	/* auto material_center = std::make_shared<LambertianMaterial>(Color(0.1, 0.2, 0.5)); */
-	/* auto material_center = std::make_shared<LambertianMaterial>(std::make_shared<ImageTexture>("res/earth.jpg")); */
-	/* auto material_left   = std::make_shared<DielectricMaterial>(1.5); */
+	auto material_center = std::make_shared<LambertianMaterial>(std::make_shared<ImageTexture>("res/earth.jpg"));
+	auto material_left   = std::make_shared<DielectricMaterial>(1.5);
 	auto material_right  = std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2), 0.0);
-	/* auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0)); */
+	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
 
 	/* list.add(std::make_shared<SphereTraceable>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground)); */
 	/* list.add(std::make_shared<SphereTraceable>(Point3( 0.0,    0.0, -1.0),   0.5, material_center)); */
@@ -98,18 +100,22 @@ int main(int argc, char** argv)
 
 	/* list.add(std::make_shared<MovingSphereTraceable>(Point3(1.0, 0.0, 1.0), Point3(-1.0, 0.0, 1.0), 0.0, 0.2, 0.5, material_center)); */
 
-	//list.add(std::make_shared<SphereTraceable>(Point3( -1.0, 3.0, 4.0), 0.4, material_light));
+	/* list.add(std::make_shared<SphereTraceable>(Point3( -2.0, 1.0, 0.0), 0.4, material_light)); */
 	/* auto material_superlight  = std::make_shared<DiffuseLightMaterial>(Color(4.0, 4.0, 3.0)); */
 	//list.add(std::make_shared<SphereTraceable>(Point3( 70.0, 200.0, 50.0), 20, material_superlight));
 
-	list.add(std::make_shared<StaticMeshTraceable>("res/IronMan2_PBR.obj", "res"));
-	list.add(std::make_shared<SphereTraceable>(Point3(30.0, 200, 50), 20.0, material_right));
+	/* list.add(std::make_shared<StaticMeshTraceable>("res/IronMan2_PBR.obj", "res")); */
+	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2")); */
+	list.add(std::make_shared<GLTFStaticMeshTraceable>("res/BoxTextured/BoxTextured.gltf", "res/BoxTextured"));
+	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/Box/Box.gltf", "res/Box")); */
+	/* list.add(std::make_shared<SphereTraceable>(Point3(30.0, 200, 50), 20.0, material_right)); */
 
 	BVHNode bvh(list, frameTime0, frameTime1);
 	print_bvh(&bvh, 0);
+	/* exit(1); */
 
 	// Render
-	const int32_t samples_per_pixel = 10;
+	const int32_t samples_per_pixel = 16;
 	const int32_t max_ray_depth = 10;
 
 	omp_set_num_threads(7);

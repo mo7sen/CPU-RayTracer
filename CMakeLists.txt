@@ -22,6 +22,7 @@ add_executable(tracer
   "${PROJECT_SOURCE_DIR}/src/traceables/MovingSphereTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/SphereTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/StaticMeshTraceable.cpp"
+  "${PROJECT_SOURCE_DIR}/src/traceables/GLTFStaticMeshTraceable.cpp"
 
   "${PROJECT_SOURCE_DIR}/src/render_targets/RenderTargetPNGImage.cpp"
   )
@@ -43,6 +44,13 @@ target_compile_options(tracer PRIVATE
   )
 
 find_package(OpenMP)
+
+set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
+set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(extern/tinygltf)
+
 target_link_libraries(tracer PUBLIC
   $<$<BOOL:OpenMP_CXX_FOUND>:OpenMP::OpenMP_CXX>
+
+  tinygltf
   )

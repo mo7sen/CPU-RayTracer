@@ -147,7 +147,7 @@ StaticMeshTraceable::StaticMeshTraceable(std::string path, std::string mtl_searc
 
 bool StaticMeshTraceable::hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const
 {
-	// return primitivesList.hit(ray, t_min, t_max, hitData);
+	/* return primitivesList.hit(ray, t_min, t_max, hitData); */
 	return primitivesBVH.hit(ray, t_min, t_max, hitData);
 }
 
@@ -176,13 +176,8 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 		const Vec3f& n1 = normals[i + 1];
 		const Vec3f& n2 = normals[i + 2];
 
-
-		//// TODO: Interpolate with barycentric coordinates
-		//Vec3f face_normal = (n0 + n1 + n2) / 3;
-
 		const Vec3f v0v1 = v1 - v0; 
 		const Vec3f v0v2 = v2 - v0; 
-	
 
 		const Vec3f face_normal = cross(v0v1, v0v2);
 		
@@ -240,6 +235,9 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 		hitData.u = (uv0.first * (1 - u - v) + uv1.first * u + uv2.first * v);
 		hitData.v = (uv0.second * (1 - u - v) + uv1.second * u + uv2.second * v);
 
+		hitData.u = fmod(hitData.u, 1.0f);
+		hitData.v = fmod(hitData.v, 1.0f);
+
 		t_max = t; // Update to make sure that only nearer triangles can be hit
 		hit = true; // this ray hits the triangle 
 	}
@@ -259,6 +257,7 @@ void StaticMeshTraceable::MeshPrimitive::addVertex(Vec3f position, Vec3f normal,
 	normals.push_back(normal);
 	uvs.push_back(uv[0]);
 	uvs.push_back(uv[1]);
+	/* printf("position: %f, %f, %f\n", position.x(), position.y(), position.z()); */
 	bounds.v_min = min(bounds.v_min, position);
 	bounds.v_max = max(bounds.v_max, position);
 }

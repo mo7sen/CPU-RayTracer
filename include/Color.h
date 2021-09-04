@@ -29,6 +29,16 @@ public:
 
 	void set(real r, real g, real b) { data[0] = r; data[1] = g; data[2] = b; }
 
+	Vec3f toVec3f() const
+	{
+		return Vec3f(data);
+	}
+
+	static Color fromVec3f(Vec3f v)
+	{
+		return Color(v.x(), v.y(), v.z());
+	}
+
 	~Color() = default;
 };
 
