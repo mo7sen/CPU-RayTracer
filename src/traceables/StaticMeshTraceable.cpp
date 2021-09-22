@@ -62,7 +62,7 @@ StaticMeshTraceable::StaticMeshTraceable(std::string path, std::string mtl_searc
 			} else {
 				mat = std::make_shared<MetalMaterial>(Color(m.diffuse[0], m.diffuse[1], m.diffuse[2]), 1.0 - (m.shininess/500.0));
 			}
-			printf("Material Name: %s, metallic: %f, roughness: %f\n", m.name, m.metallic, m.roughness);
+			printf("Material Name: %s, metallic: %f, roughness: %f\n", m.name.c_str(), m.metallic, m.roughness);
 			break;
 
 		case 0:		// Color on and Ambient off
@@ -193,9 +193,9 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 
 		const float face_idx = floor(i / 3);
 		
-		const auto uv0 = std::pair<float, float>(uvs[face_idx + (0ull) + 0ull], uvs[face_idx + (0ull) + 1ull]);
-		const auto uv1 = std::pair<float, float>(uvs[face_idx + (2ull) + 0ull], uvs[face_idx + (2ull) + 1ull]);
-		const auto uv2 = std::pair<float, float>(uvs[face_idx + (4ull) + 0ull], uvs[face_idx + (4ull) + 1ull]);
+		const auto uv0 = std::pair<float, float>(uvs[face_idx * 6 + (0ull) + 0ull], uvs[face_idx * 6 + (0ull) + 1ull]);
+		const auto uv1 = std::pair<float, float>(uvs[face_idx * 6 + (2ull) + 0ull], uvs[face_idx * 6 + (2ull) + 1ull]);
+		const auto uv2 = std::pair<float, float>(uvs[face_idx * 6 + (4ull) + 0ull], uvs[face_idx * 6 + (4ull) + 1ull]);
 
 		float t = dot((ray.origin() - v0), face_normal) / N_dot_Dir;
 
@@ -231,12 +231,25 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 		hitData.hitPos = P;
 		hitData.t = t;
 		hitData.material = material;
-		hitData.hitNormal = n0 * (1-u-v) + n1 * u + n2 * v;
-		hitData.u = (uv0.first * (1 - u - v) + uv1.first * u + uv2.first * v);
-		hitData.v = (uv0.second * (1 - u - v) + uv1.second * u + uv2.second * v);
+		hitData.hitNormal = 
+			n0 *          u     +
+			n1 *              v + 
+			n2 * ( 1.0f - u - v );
 
-		hitData.u = fmod(hitData.u, 1.0f);
-		hitData.v = fmod(hitData.v, 1.0f);
+		hitData.u = (
+				( uv0.first  *      u      ) + 
+				( uv1.first  *          v  ) +
+				( uv2.first  * (1 - u - v) )
+		);
+
+		hitData.v = (
+				( uv0.second *      u      ) + 
+				( uv1.second *          v  ) +
+				( uv2.second * (1 - u - v) )
+		);
+
+		hitData.u = fmod(hitData.u, 1.001f);
+		hitData.v = 1.0f - fmod(hitData.v, 1.001f);
 
 		t_max = t; // Update to make sure that only nearer triangles can be hit
 		hit = true; // this ray hits the triangle 
@@ -252,12 +265,13 @@ bool StaticMeshTraceable::MeshPrimitive::bounding_box(real time0, real time1, AA
 
 void StaticMeshTraceable::MeshPrimitive::addVertex(Vec3f position, Vec3f normal, float uv[2])
 {
-	// printf("Position: (%f, %f, %f)\n", position.x(), position.y(), position.z());
 	positions.push_back(position);
 	normals.push_back(normal);
 	uvs.push_back(uv[0]);
 	uvs.push_back(uv[1]);
-	/* printf("position: %f, %f, %f\n", position.x(), position.y(), position.z()); */
+
 	bounds.v_min = min(bounds.v_min, position);
 	bounds.v_max = max(bounds.v_max, position);
+
+	printf("%f, %f\n", uv[0], uv[1]);
 }

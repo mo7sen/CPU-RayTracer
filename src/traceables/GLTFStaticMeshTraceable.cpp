@@ -4,6 +4,8 @@
 #include <materials/MetalMaterial.h>
 #include <materials/DiffuseLightMaterial.h>
 #include <materials/PBRMaterial.h>
+#include <materials/UVDbgMaterial.h>
+#include <materials/NormalDbgMaterial.h>
 
 #include <textures/CheckeredTexture.h>
 #include <textures/ImageTexture.h>
@@ -37,7 +39,9 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
     exit(1);
   }
 
-  std::vector<std::shared_ptr<PBRMaterial>> materials;
+  /* std::vector<std::shared_ptr<PBRMaterial>> materials; */
+  /* std::vector<std::shared_ptr<UVDbgMaterial>> materials; */
+  std::vector<std::shared_ptr<Material>> materials;
   materials.reserve(model.materials.size());
   for(auto& mat : model.materials)
   {
@@ -102,6 +106,8 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
     }
 
     materials.push_back(std::make_shared<PBRMaterial>(m));
+    /* materials.push_back(std::make_shared<NormalDbgMaterial>()); */
+    /* materials.push_back(std::make_shared<UVDbgMaterial>()); */
   }
 
   /* printf("Mesh Count: %lu\n", model.meshes.size()); */
@@ -138,8 +144,8 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
         auto attribBufferView = model.bufferViews[attribAccessor.bufferView];
         auto attribBuffer = model.buffers[attribBufferView.buffer];
         auto attribStride = attribAccessor.ByteStride(attribBufferView);
-        printf("Attribute Name: %s, Attribute Count: %u\n", attrib.first.c_str(), uint32_t(attribAccessor.count));
-        printf("Attribute Size: %lu, AttributeStride: %lu\n", attribBufferView.byteLength / attribAccessor.count, attribBufferView.byteStride);
+        /* printf("Attribute Name: %s, Attribute Count: %u\n", attrib.first.c_str(), uint32_t(attribAccessor.count)); */
+        /* printf("Attribute Size: %lu, AttributeStride: %lu\n", attribBufferView.byteLength / attribAccessor.count, attribBufferView.byteStride); */
 
 
         for(size_t index_i = 0; index_i < index_count; index_i++)
@@ -158,7 +164,7 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
           }
           else if(attrib.first.compare("TEXCOORD_0") == 0)
           {
-            uvs.push_back(Vec3f(vert[0], vert[1], vert[1]));
+            uvs.push_back(Vec3f(vert[0], vert[1], vert[0]));
           }
           else
           {

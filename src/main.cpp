@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 	// Camera
 	real fov = 60;
 	/* Vec3f look_from(0.0f, 200.0f, 100.0f); */
-	Vec3f look_from(-2.0f, 5.0f, 5.0f);
-	/* Vec3f look_from(0.0f, 3.0f, 2.0f); */
+	Vec3f look_from(-2.0f, 3.0f, 3.0f);
+	/* Vec3f look_from(-1.0f, 0.0f, 2.0f); */
 	/* Vec3f look_at(0.0f, 200.0f, -1.0f); */
 	Vec3f look_at(0.0f, 0.0f, -1.0f);
 	/* Vec3f look_at(0.0f, 0.0f, 0.0f); */
@@ -77,10 +77,8 @@ int main(int argc, char** argv)
 	real frameTime1 = 1.0;
 	Camera camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
 
-	/* Color background = Color(0, 0, 0); */
-	// Color background = Color(1, 1, 1);
 	/* ImageTexture background("res/earth.jpg"); */
-	SolidColorTexture background(Color(0.1, 0.1, 0.1));
+	SolidColorTexture background(Color(0.2));
 
 	// SceneDielectricMaterial
 	ListTraceable list;
@@ -92,7 +90,7 @@ int main(int argc, char** argv)
 	auto material_right  = std::make_shared<MetalMaterial>(Color(0.8, 0.6, 0.2), 0.0);
 	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
 
-	/* list.add(std::make_shared<SphereTraceable>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground)); */
+	list.add(std::make_shared<SphereTraceable>(Point3( 0.0, -101.0, -1.0), 100.0, material_ground));
 	/* list.add(std::make_shared<SphereTraceable>(Point3( 0.0,    0.0, -1.0),   0.5, material_center)); */
 	/* list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0),   0.5, material_left)); */
 	/* list.add(std::make_shared<SphereTraceable>(Point3(-1.0,    0.0, -1.0), -0.45, material_left)); */
@@ -105,8 +103,9 @@ int main(int argc, char** argv)
 	//list.add(std::make_shared<SphereTraceable>(Point3( 70.0, 200.0, 50.0), 20, material_superlight));
 
 	/* list.add(std::make_shared<StaticMeshTraceable>("res/IronMan2_PBR.obj", "res")); */
-	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2")); */
-	list.add(std::make_shared<GLTFStaticMeshTraceable>("res/BoxTextured/BoxTextured.gltf", "res/BoxTextured"));
+	list.add(std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2"));
+	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/Duck/Duck.gltf", "res/Duck")); */
+	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/BoxTextured/BoxTextured.gltf", "res/BoxTextured")); */
 	/* list.add(std::make_shared<GLTFStaticMeshTraceable>("res/Box/Box.gltf", "res/Box")); */
 	/* list.add(std::make_shared<SphereTraceable>(Point3(30.0, 200, 50), 20.0, material_right)); */
 
@@ -115,7 +114,7 @@ int main(int argc, char** argv)
 	/* exit(1); */
 
 	// Render
-	const int32_t samples_per_pixel = 16;
+	const int32_t samples_per_pixel = 64;
 	const int32_t max_ray_depth = 10;
 
 	omp_set_num_threads(7);
