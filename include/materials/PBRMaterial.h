@@ -22,7 +22,7 @@ public:
 
         Vec3f reflected = reflect(normalize(ray_in.direction()), hitData.hitNormal);
         ray_scattered = Ray(hitData.hitPos, reflected + roughnessFactor * random_vec_in_unit_sphere(), ray_in.time());
-        attenuation = baseColor->value(hitData.u, hitData.v, hitData.hitPos) * (roughnessFactor * (1.0f - metallicFactor));
+        attenuation = baseColor->value(hitData.u, hitData.v, hitData.hitPos) * (1.0f - (roughnessFactor - metallicFactor));
 
         return (dot(ray_scattered.direction(), hitData.hitNormal) > 0);
     }
