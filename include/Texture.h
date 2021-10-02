@@ -6,5 +6,5 @@
 class Texture 
 {
 public:
-	virtual Color value(double u, double v, const Point3& p) const = 0;
+	virtual Color value(double u, double v, const Point3& p) const { return Color(0.0f); }
 };

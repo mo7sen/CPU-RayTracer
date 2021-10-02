@@ -23,6 +23,10 @@ add_executable(tracer
   "${PROJECT_SOURCE_DIR}/src/traceables/SphereTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/StaticMeshTraceable.cpp"
   "${PROJECT_SOURCE_DIR}/src/traceables/GLTFStaticMeshTraceable.cpp"
+  "${PROJECT_SOURCE_DIR}/src/traceables/AARectTraceable.cpp"
+  "${PROJECT_SOURCE_DIR}/src/traceables/BoxTraceable.cpp"
+  "${PROJECT_SOURCE_DIR}/src/traceables/RotateYTraceable.cpp"
+  "${PROJECT_SOURCE_DIR}/src/traceables/VolumeTraceable.cpp"
 
   "${PROJECT_SOURCE_DIR}/src/render_targets/RenderTargetPNGImage.cpp"
   )
