@@ -8,6 +8,9 @@ class HitData
 public:
 	Point3 hitPos;
 	Vec3f hitNormal;
+	Vec3f hitTangent;
+	Vec3f hitBitangent;
+
 	real t;
 	std::shared_ptr<Material> material;
 	bool front; // Ray entering the object

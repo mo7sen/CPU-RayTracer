@@ -138,6 +138,11 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
       std::vector<Vec3f> uvs;
       uvs.reserve(index_count);
 
+      std::vector<Vec3f> tangents;
+      tangents.reserve(index_count);
+      std::vector<Vec3f> bitangents;
+      bitangents.reserve(index_count);
+
       for(auto& attrib : prim.attributes)
       {
         auto attribAccessor = model.accessors[attrib.second];
@@ -166,6 +171,11 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
           {
             uvs.push_back(Vec3f(vert[0], vert[1], vert[0]));
           }
+          else if(attrib.first.compare("TANGENT") == 0)
+          {
+            tangents.push_back(Vec3f(vert[0], vert[1], vert[2]));
+            bitangents.push_back(normalize(cross(normals[index_i], tangents[index_i])) * vert[3]);
+          }
           else
           {
             break;
@@ -176,7 +186,7 @@ GLTFStaticMeshTraceable::GLTFStaticMeshTraceable(std::string path, std::string r
       {
         float uv[2] = { uvs[index_i].x(), uvs[index_i].y() };
         /* printf("positions[%lu]: %f, %f, %f\n", index_i, positions[index_i].x(), positions[index_i].y(), positions[index_i].z()); */
-        mesh_prim->addVertex(positions[index_i], normals[index_i], uv);
+        mesh_prim->addVertex(positions[index_i], normals[index_i], uv, tangents[index_i], bitangents[index_i]);
       }
       assert(index_count != 0);
       assert(index_count % 3 == 0);

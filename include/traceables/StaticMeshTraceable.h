@@ -13,6 +13,8 @@ public:
 		std::vector<Vec3f> positions;
 		std::vector<Vec3f> normals;
 		std::vector<float> uvs;
+		std::vector<Vec3f> tangents;
+		std::vector<Vec3f> bitangents;
 		std::shared_ptr<Material> material;
 		AABB bounds;
 	public:
@@ -22,6 +24,7 @@ public:
 			bounds = AABB(Vec3f(std::numeric_limits<float>::max()), Vec3f(std::numeric_limits<float>::min()));
 		};
 		void addVertex(Vec3f position, Vec3f normal, float uv[2]);
+		void addVertex(Vec3f position, Vec3f normal, float uv[2], Vec3f tangent, Vec3f bitangent);
 		virtual bool hit(const Ray& ray, real t_min, real t_max, HitData& hitData) const override;
 		virtual bool bounding_box(real time0, real time1, AABB& aabb) const override;
 	};

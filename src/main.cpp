@@ -19,6 +19,8 @@
 #include <traceables/MovingSphereTraceable.h>
 #include <traceables/StaticMeshTraceable.h>
 #include <traceables/GLTFStaticMeshTraceable.h>
+#include <traceables/TranslateTraceable.h>
+#include <traceables/RotateYTraceable.h>
 
 #include <materials/LambertianMaterial.h>
 #include <materials/MetalMaterial.h>
@@ -31,7 +33,10 @@
 #define BOOK2_SCENE_CORNELLBOXSMOKE 3
 #define BOOK2_SCENE_FINAL 4
 
-#define ACTIVE_SCENE BOOK2_SCENE_FINAL
+#define DAMAGEDHELMET_SCENE 5
+#define SPONZA_SCENE 6
+
+#define ACTIVE_SCENE BOOK1_SCENE_COVER
 
 ListTraceable set_scene(const int &scene_id, Camera &camera, SolidColorTexture &background, int32_t &samples_per_pixel);
 
@@ -109,7 +114,7 @@ int main(int argc, char** argv)
 	/* exit(1); */
 
 	// Render
-	const int32_t max_ray_depth = 50;
+	const int32_t max_ray_depth = 5;
 
 	omp_set_num_threads(7);
 
@@ -133,6 +138,9 @@ int main(int argc, char** argv)
 			pixel_color.reduce();
 			render_target.setPixel(i, j, pixel_color);
 		}
+		if(j % 10 == 0) {
+			render_target.renderFrame();
+		}
 		printf("Scanline %d\n", j);
 	}
 	render_target.renderFrame();
@@ -145,6 +153,31 @@ ListTraceable book1_cover_scene()
 
   auto ground_material = std::make_shared<LambertianMaterial>(Color(0.5));
   world.add(std::make_shared<SphereTraceable>(Point3(0,-1000,0), 1000, ground_material));
+
+	world.add(
+			std::make_shared<TranslateTraceable>(
+				std::make_shared<RotateYTraceable>(
+					std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2"), 
+				0.0f), // Y Rotation
+			Vec3f(7.0f, 1.0f, -1.0f)) // Position
+		);
+
+	world.add(
+			std::make_shared<TranslateTraceable>(
+				std::make_shared<RotateYTraceable>(
+					std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2"), 
+				170.0f), // Y Rotation
+			Vec3f(5.0f, 1.0f, 1.5f)) // Position
+		);
+
+	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
+
+	world.add(
+			std::make_shared<TranslateTraceable>(
+	        std::make_shared<SphereTraceable>(Point3(0.0), 0.5, material_light),
+			Vec3f(3.0f, 3.0f, 0.0f)) // Position
+		);
+
 
   for (int a = -11; a < 11; a++) {
       for (int b = -11; b < 11; b++) {
@@ -201,8 +234,6 @@ ListTraceable book2_simplelight_scene()
 }
 
 #include <traceables/BoxTraceable.h>
-#include <traceables/TranslateTraceable.h>
-#include <traceables/RotateYTraceable.h>
 ListTraceable book2_cornellbox_scene()
 {
 	ListTraceable world;
@@ -260,6 +291,35 @@ ListTraceable book2_cornellboxsmoke_scene()
 	box2 = std::make_shared<TranslateTraceable>(box2, Vec3f(130.0f, 0.0f, 65.0f));
 	box2 = std::make_shared<VolumeTraceable>(box2, 0.01, Color(1.0f));
 	world.add(box2);
+
+	return world;
+}
+
+ListTraceable damagedhelmet_scene()
+{
+	ListTraceable world;
+
+	const auto material_ground = std::make_shared<LambertianMaterial>(std::make_shared<CheckeredTexture>(Color(0.0, 0.0, 0.0), Color(1.0, 1.0, 1.0), 10.0));
+	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
+	/* world.add(std::make_shared<SphereTraceable>(Point3( -2.0, 1.0, 0.0), 0.4, material_light)); */
+
+	/* world.add(std::make_shared<SphereTraceable>(Point3( 0.0, -101.0, -1.0), 100.0, material_ground)); */
+	world.add(std::make_shared<GLTFStaticMeshTraceable>("res/DamagedHelmet2/DamagedHelmet2.gltf", "res/DamagedHelmet2"));
+
+
+	return world;
+}
+
+ListTraceable sponza_scene()
+{
+	ListTraceable world;
+
+	const auto material_ground = std::make_shared<LambertianMaterial>(std::make_shared<CheckeredTexture>(Color(0.0, 0.0, 0.0), Color(1.0, 1.0, 1.0), 10.0));
+	auto material_light  = std::make_shared<DiffuseLightMaterial>(Color(40.0, 40.0, 32.0));
+	world.add(std::make_shared<SphereTraceable>(Point3( -0.5, 0.2, 0.2), 0.1, material_light));
+
+	world.add(std::make_shared<GLTFStaticMeshTraceable>("res/WaterBottle/WaterBottle.gltf", "res/WaterBottle"));
+
 
 	return world;
 }
@@ -339,14 +399,14 @@ ListTraceable set_scene(const int &scene_id, Camera &camera, SolidColorTexture &
 			const Vec3f look_at(0.0f, 0.0f, 0.0f);
 			const Vec3f up(0.0f, 1.0f, 0.0f);
 			const auto aspect_ratio = real(16.0 / 9.0);
-			const real fov = 60;
-			const real aperture = 0.1;
+			const real fov = 40;
+			const real aperture = 0.01;
 			const auto dist_to_focus = 10.0f;
 			real frameTime0 = 0.0;
 			real frameTime1 = 1.0;
 
-			background = SolidColorTexture(Color(0.5));
-			samples_per_pixel = 500;
+			background = SolidColorTexture(Color(0.1));
+			samples_per_pixel = 10000;
 
 			camera = Camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
 
@@ -418,7 +478,7 @@ ListTraceable set_scene(const int &scene_id, Camera &camera, SolidColorTexture &
 			}
 		case BOOK2_SCENE_FINAL:
 			{
-				samples_per_pixel = 10000;
+				samples_per_pixel = 100;
 				background = Color(0.0f);
 
 				const Vec3f look_from(478, 278, -600);
@@ -434,6 +494,46 @@ ListTraceable set_scene(const int &scene_id, Camera &camera, SolidColorTexture &
 				camera = Camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
 
 				return book2_final_scene();
+				/* break; */
+			}
+		case DAMAGEDHELMET_SCENE:
+			{
+				samples_per_pixel = 10;
+				background = Color(0.3f);
+
+				const Vec3f look_from(-2, 3, 4);
+				const Vec3f look_at(0, 0, 0);
+				const Vec3f up(0.0f, 1.0f, 0.0f);
+				const auto aspect_ratio = real(16.0 / 9.0);
+				const real fov = 40;
+				const real aperture = 0.1;
+				const auto dist_to_focus = length(look_at - look_from);
+				real frameTime0 = 0.0;
+				real frameTime1 = 1.0;
+
+				camera = Camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
+
+				return damagedhelmet_scene();
+				/* break; */
+			}
+		case SPONZA_SCENE:
+			{
+				samples_per_pixel = 10;
+				background = Color(0.1f);
+
+				const Vec3f look_from(-0.2, 0.3, 0.4);
+				const Vec3f look_at(0, 0, 0);
+				const Vec3f up(0.0f, 1.0f, 0.0f);
+				const auto aspect_ratio = real(16.0 / 9.0);
+				const real fov = 40;
+				const real aperture = 0.01;
+				const auto dist_to_focus = length(look_at - look_from);
+				real frameTime0 = 0.0;
+				real frameTime1 = 1.0;
+
+				camera = Camera(look_from, look_at, up, fov, aspect_ratio, aperture, dist_to_focus, frameTime0, frameTime1);
+
+				return sponza_scene();
 				/* break; */
 			}
 		default:

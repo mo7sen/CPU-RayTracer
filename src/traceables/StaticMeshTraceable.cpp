@@ -176,6 +176,14 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 		const Vec3f& n1 = normals[i + 1];
 		const Vec3f& n2 = normals[i + 2];
 
+		const Vec3f& t0 = tangents[i + 0];
+		const Vec3f& t1 = tangents[i + 1];
+		const Vec3f& t2 = tangents[i + 2];
+
+		const Vec3f& bt0 = bitangents[i + 0];
+		const Vec3f& bt1 = bitangents[i + 1];
+		const Vec3f& bt2 = bitangents[i + 2];
+
 		const Vec3f v0v1 = v1 - v0; 
 		const Vec3f v0v2 = v2 - v0; 
 
@@ -231,10 +239,19 @@ bool StaticMeshTraceable::MeshPrimitive::hit(const Ray& ray, real t_min, real t_
 		hitData.hitPos = P;
 		hitData.t = t;
 		hitData.material = material;
-		hitData.hitNormal = 
+
+		hitData.hitNormal =
 			n0 *          u     +
 			n1 *              v + 
 			n2 * ( 1.0f - u - v );
+		hitData.hitTangent =
+			t0 *          u     +
+			t1 *              v + 
+			t2 * ( 1.0f - u - v );
+		hitData.hitBitangent =
+			bt0 *          u     +
+			bt1 *              v + 
+			bt2 * ( 1.0f - u - v );
 
 		hitData.u = (
 				( uv0.first  *      u      ) + 
@@ -263,6 +280,21 @@ bool StaticMeshTraceable::MeshPrimitive::bounding_box(real time0, real time1, AA
 	return true;
 }
 
+void StaticMeshTraceable::MeshPrimitive::addVertex(Vec3f position, Vec3f normal, float uv[2], Vec3f tangent, Vec3f bitangent)
+{
+	positions.push_back(position);
+	normals.push_back(normal);
+	uvs.push_back(uv[0]);
+	uvs.push_back(uv[1]);
+	tangents.push_back(tangent);
+	bitangents.push_back(bitangent);
+
+	bounds.v_min = min(bounds.v_min, position);
+	bounds.v_max = max(bounds.v_max, position);
+
+	/* printf("%f, %f\n", uv[0], uv[1]); */
+}
+
 void StaticMeshTraceable::MeshPrimitive::addVertex(Vec3f position, Vec3f normal, float uv[2])
 {
 	positions.push_back(position);
@@ -273,5 +305,5 @@ void StaticMeshTraceable::MeshPrimitive::addVertex(Vec3f position, Vec3f normal,
 	bounds.v_min = min(bounds.v_min, position);
 	bounds.v_max = max(bounds.v_max, position);
 
-	printf("%f, %f\n", uv[0], uv[1]);
+	/* printf("%f, %f\n", uv[0], uv[1]); */
 }

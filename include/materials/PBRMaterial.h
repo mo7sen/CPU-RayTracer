@@ -11,20 +11,33 @@ public:
 
     bool scatter(const Ray& ray_in, const HitData& hitData, Color& attenuation, Ray& ray_scattered) const
     {
-        /* if(normalMap) */
-        /* { */
-            // TODO calculate hitNormal (Needs adding TBN matrix in multiple places, I guess)
-        /* } */
+        Vec3f normal = hitData.hitNormal;
+        if(normalMap)
+        {
+            Color normalColor = normalMap.value()->value(hitData.u, hitData.v, hitData.hitPos);
+            Vec3f mapNormal = normalColor.toVec3f() * 2.0f - Vec3f(1.0f);
+
+            Vec3f TBN_R0(hitData.hitTangent.x(), hitData.hitBitangent.x(), hitData.hitNormal.x());
+            Vec3f TBN_R1(hitData.hitTangent.y(), hitData.hitBitangent.y(), hitData.hitNormal.y());
+            Vec3f TBN_R2(hitData.hitTangent.z(), hitData.hitBitangent.z(), hitData.hitNormal.z());
+
+            normal = Vec3f(
+                    dot(TBN_R0, mapNormal),
+                    dot(TBN_R1, mapNormal),
+                    dot(TBN_R2, mapNormal));
+
+            normal = normalize(normal);
+        }
 
         Color metallicRoughnessColor = metallicRoughness->value(hitData.u, hitData.v, hitData.hitPos);
         float metallicFactor = metallicRoughnessColor.b();
         float roughnessFactor = metallicRoughnessColor.g();
 
-        Vec3f reflected = reflect(normalize(ray_in.direction()), hitData.hitNormal);
+        Vec3f reflected = reflect(normalize(ray_in.direction()), normal);
         ray_scattered = Ray(hitData.hitPos, reflected + roughnessFactor * random_vec_in_unit_sphere(), ray_in.time());
         attenuation = baseColor->value(hitData.u, hitData.v, hitData.hitPos) * (1.0f - (roughnessFactor - metallicFactor));
 
-        return (dot(ray_scattered.direction(), hitData.hitNormal) > 0);
+        return (dot(ray_scattered.direction(), normal) > 0);
     }
 
     Color emitted(double u, double v, const Point3& p) const
